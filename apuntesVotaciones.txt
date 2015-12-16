@@ -1,0 +1,49 @@
+TRANSACCIONES JAVA:
+
+try{
+	Conexion.setAutocomit(false);
+	ObjCenso.votar(Votante, Conexion);
+	ObjPartidos.registrarVoto(PartidoVotado, Conexion);
+	Conexion.commit();
+}catch(SQLException SQLEx){
+	if (Conexion != null){
+		try{
+			Conexion.rollback();
+			}catch(SQLException SQLEx2){}
+		}
+	}
+en votar(votante, conexion){
+	lanzar excepcion cuando las filas devueltas == 0.
+}
+
+SENTENCIAS PREPARADAS:
+
+try{
+
+	PreparedStatement PStm = _Conexion.prepareStatement(
+	"SELECT NIF FROM CENSO WHERE NIF = ? AND CLAVE = ? AND VOTO 	= 0");
+	PStm.setString(1, nif);
+	PStm.setString(2, clave);
+	ResultSet rs = PStm.executeQuery();
+
+if(rs.next())
+	return true;
+}catch(SQLException SQLE){
+	SQLE.getMessage();
+}
+
+
+DISPATCHER:
+
+ServletContext sc = getServletContext(); 
+//OBJ que devuelve el contexto del servlet.
+
+RequestDispatcher rd; 
+//OBJ de tipo dispatcher.
+
+rd = sc.getRequestDispatcher("/servletVotante");
+//redirige al servlet que comprueba si el usuario ha votado.
+
+rd.forward(request, response);
+//pasa al process request del servlet destino los datos que se manejan aqui.
+                    
