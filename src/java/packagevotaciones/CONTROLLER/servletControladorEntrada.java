@@ -35,9 +35,11 @@ public class servletControladorEntrada extends HttpServlet {
        @Override
    public void init() throws ServletException {
        /* Establecemos la conexi�n, si no existe */
-            try{
+            
+       try{
                 ConexBD = ConexionBBDD.GetConexion();//ConexDB se cre� en el JspInit(), luego usa aqu�l y no crea objeto.
                 Conexion = ConexBD.GetCon();
+                
             }catch(ClassNotFoundException cnfe){  
                 }
             catch(SQLException sqle){
@@ -57,12 +59,13 @@ public class servletControladorEntrada extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
+            
+        Operaciones op = new Operaciones();    
             /* TODO output your page here. You may use following sample code. */
         //datos usuario
         String nif = request.getParameter("nifVotante");  
         String pass = request.getParameter("claveVotante");
-        
-        
+
 //        Blob clave; //tipo blob para almacenar el dato pass a convertir.
 //        
 //        byte[] byteContent = pass.getBytes(); // tipo byte, instancia que almacena el String
@@ -74,7 +77,6 @@ public class servletControladorEntrada extends HttpServlet {
         }
         else{
             Votantes usuario = new Votantes(nif, pass);
-            Operaciones op = new Operaciones();
 
             String value = request.getParameter("btn-index");
             

@@ -7,10 +7,18 @@ package packagevotaciones.CONTROLLER;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import packagevotaciones.DAO.ConexionBBDD;
+import packagevotaciones.DAO.Operaciones;
+import packagevotaciones.MODEL.Votantes;
+
 
 /**
  *
@@ -18,6 +26,25 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class servletCenso extends HttpServlet {
 
+    private Connection Conexion;
+    private ConexionBBDD ConexBD;
+    private ArrayList<Votantes> censo;
+    private HttpSession Sesion;
+    
+       @Override
+   public void init() throws ServletException {
+       /* Establecemos la conexi�n, si no existe */
+            
+       try{
+                ConexBD = ConexionBBDD.GetConexion();//ConexDB se cre� en el JspInit(), luego usa aqu�l y no crea objeto.
+                Conexion = ConexBD.GetCon();
+                
+            }catch(ClassNotFoundException cnfe){  
+                }
+            catch(SQLException sqle){
+            }
+      }
+    
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -32,15 +59,26 @@ public class servletCenso extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet servletCenso</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet servletCenso at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+            
+            censo = new Operaciones().censoElectoral(Conexion);
+            
+            Sesion = request.getSession(false);
+            Sesion.setAttribute("censo", censo);
+            
+            response.sendRedirect("censo.jsp");
+            
+            
+            
+            
+//            out.println("<!DOCTYPE html>");
+//            out.println("<html>");
+//            out.println("<head>");
+//            out.println("<title>Servlet servletCenso</title>");            
+//            out.println("</head>");
+//            out.println("<body>");
+//            out.println("<h1>Servlet servletCenso at " + request.getContextPath() + "</h1>");
+//            out.println("</body>");
+//            out.println("</html>");
         }
     }
 

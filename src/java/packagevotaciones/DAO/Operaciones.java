@@ -9,7 +9,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import packagevotaciones.MODEL.Partidos;
 import packagevotaciones.MODEL.Votantes;
 
 /**
@@ -24,7 +28,6 @@ import packagevotaciones.MODEL.Votantes;
      
     public boolean usuario(Connection _conexion, Votantes _user){
 
-        String _clave = _user.getClave();
         String _dni = _user.getDni();
         boolean bnd = false;
         Votantes userBD;
@@ -60,17 +63,95 @@ import packagevotaciones.MODEL.Votantes;
     public void eliminarPartido(){
         
     }
-    
-    public void añadirVotante(Connection _conexion, Votantes _nuevoU){
+    /**
+     * 
+     * @param _conexion
+     * @param _nuevoU
+     * @return boolean que indica si la inserción se ha realizado correctamente
+     * 
+     */
+    public boolean addVotante(Connection _conexion, Votantes _nuevoU){
+                
+            String _dni = _nuevoU.getDni();
+            String _clave = _nuevoU.getClave();
+            int _voto = _nuevoU.getVoto();
+            
+            boolean flg = false;
+        try {    
+            PreparedStatement PStm = _conexion.prepareStatement("INSERT INTO votantes VALUES ('"+_dni+"', aes_encrypt('"+_clave+"', '"+_dni+"'), "+_voto+") ;");
+//            PStm.setString(1, _dni);
+//            PStm.setString(2, _clave);
+//            PStm.setInt(3, _voto);
+            PStm.executeUpdate();
+            flg = true;
+        } catch (SQLException ex) {
+            ex.getMessage();
+            if (_conexion != null){
+		try{
+                    flg = false;
+                    _conexion.rollback();
+                }catch(SQLException SQLEx2){
+                    SQLEx2.getMessage();}
+		}
+	}
+        
+        return flg;
+         
+        }
+        
+    public void addPartido(Connection _conexion, Partidos _nuevoP){
+        
+         
+        
+        
         
     }
     
-    public void añadirPartido(){
+    /**
+     * 
+     * @param _conexion
+     * @return ArrayList de objetos Votantes 
+     */
+    public ArrayList<Votantes> censoElectoral(Connection _conexion){
+        ArrayList<Votantes> _censo = new ArrayList();
+        
+        try {
+            Statement st = _conexion.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM votantes");
+            
+            while(rs.next()){
+                
+                Votantes _censado = new Votantes(rs.getString("dni"), rs.getInt("voto"));
+                _censo.add(_censado);
+                
+            }
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(Operaciones.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return _censo;
         
     }
     
-    public void censoElectoral(Connection _conexion){
+    public ArrayList<Partidos> censoPartidos(Connection _conexion){
+        ArrayList<Partidos> _partidos = new ArrayList();
         
+        try{
+            Statement st = _conexion.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM partidos");
+            
+            while(rs.next()){
+                
+                Partidos _partido = new Partidos(rs.getString("logo"), rs.getString("nombre"));
+                _partidos.add(_partido);
+            }
+            
+            
+        }  catch (SQLException ex) {
+            Logger.getLogger(Operaciones.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return _partidos;
         
     }
     

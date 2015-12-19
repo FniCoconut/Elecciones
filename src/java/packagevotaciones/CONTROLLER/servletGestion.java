@@ -7,10 +7,16 @@ package packagevotaciones.CONTROLLER;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.SQLException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import packagevotaciones.DAO.ConexionBBDD;
+import packagevotaciones.DAO.Operaciones;
+import packagevotaciones.MODEL.Partidos;
 import packagevotaciones.MODEL.Votantes;
 
 /**
@@ -28,27 +34,75 @@ public class servletGestion extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    
+    private Connection Conexion;
+    private ConexionBBDD ConexBD;
+
+       @Override
+   public void init() throws ServletException {
+       /* Establecemos la conexi�n, si no existe */
+            
+       try{
+                ConexBD = ConexionBBDD.GetConexion();//ConexDB se cre� en el JspInit(), luego usa aqu�l y no crea objeto.
+                Conexion = ConexBD.GetCon();
+                
+            }catch(ClassNotFoundException cnfe){  
+                }
+            catch(SQLException sqle){
+            }
+      }
+    
+    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
+           
+        HttpSession Sesion = request.getSession(false); 
             
-        String nif = request.getParameter("nifVotante");  
-        String pass = request.getParameter("claveVotante");
+        Operaciones op = new Operaciones();
+        String value = request.getParameter("alta");
+        boolean proceso;    
         
-        Votantes usuario = new Votantes(nif, pass);
+        switch(value){
             
+            case "Alta Usuario":
+                String nif = request.getParameter("nifVotante");  
+                String pass = request.getParameter("claveVotante");
+
+                Votantes usuario = new Votantes(nif, pass);
+                
+                proceso = op.addVotante(Conexion, usuario);
+                Sesion.setAttribute("estadoInsert", proceso);
+                
+                out.println(usuario);
+                response.sendRedirect("administracion.jsp");
+                break;
+            
+            case "Alta Partido":
+                
+                String logo = request.getParameter("lP");
+                String nombre = request.getParameter("nomP");
+                
+                Partidos partido = new Partidos(logo, nombre);
+                
+//                proceso = op.añadirPartido(Conexion, partido);
+                
+                out.println(partido);
+                break;
+        }
+        
             /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet servletGestion</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println(usuario);
-            out.println("<h1>Servlet servletGestion at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+//            out.println("<!DOCTYPE html>");
+//            out.println("<html>");
+//            out.println("<head>");
+//            out.println("<title>Servlet servletGestion</title>");            
+//            out.println("</head>");
+//            out.println("<body>");
+//            out.println(usuario);
+//            out.println("<h1>Servlet servletGestion at " + request.getContextPath() + "</h1>");
+//            out.println("</body>");
+//            out.println("</html>");
         }
     }
 

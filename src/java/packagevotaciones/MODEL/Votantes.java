@@ -30,6 +30,12 @@ public class Votantes {
         this.voto = 0;
     }
 
+    public Votantes(String dni, int voto) {
+        this.dni = dni;
+        this.clave="";
+        this.voto = voto;
+    }
+
     public String getDni() {
         return dni;
     }
